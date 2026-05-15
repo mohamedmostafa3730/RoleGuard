@@ -56,4 +56,20 @@ class RoleController extends Controller
 
         return redirect()->route('admin.roles.index')->with('success', 'Role updated successfully.');
     }
+
+    public function destroy(Role $role)
+    {
+        // Prevent deleting yourself
+        if (auth()->user()->id === $role->id) {
+            return back()->with('error', 'You cannot delete your own account.');
+        }
+        // cann't delete role admin
+        if ($role->hasRole('admin')) {
+            return back()->with('error', 'You cannot delete role admin.');
+        }
+
+
+        $role->delete();
+        return redirect()->route('admin.roles.index')->with('success', 'Role deleted successfully.');
+    }
 }

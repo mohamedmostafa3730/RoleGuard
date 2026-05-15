@@ -4,13 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Manage Users</title>
+    <title>Admin - Manage Roles</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-    body {
-        font-family: 'Inter', sans-serif;
-    }
+        body {
+            font-family: 'Inter', sans-serif;
+        }
     </style>
 </head>
 
@@ -23,9 +23,9 @@
                 <p class="text-slate-500 mt-1">Define system access levels and configure specific permission sets.</p>
             </div>
             <div class="flex items-center gap-4">
-                <a href="{{ route('admin.users.index') }}"
+                <a href="{{ route('dashboard') }}"
                     class="inline-flex items-center text-sm font-medium text-slate-500 hover:text-blue-600 transition">
-                    ← Back to Users
+                    ← Back
                 </a>
             </div>
         </div>
@@ -38,17 +38,14 @@
                 <span class="text-xs font-bold text-slate-500 uppercase tracking-tight">Access Control List (ACL)</span>
             </div>
 
-            @can('create-roles')
-            <div class="flex gap-3 w-full md:w-auto">
-                <a href="{{ route('admin.roles.create') }}"
-                    class="flex-1 md:flex-none text-center px-6 py-2.5 bg-slate-900 text-white text-xs font-black uppercase tracking-widest rounded-xl hover:bg-slate-800 transition-all active:scale-95 shadow-md">
-                    Define New Role
-                </a>
-            </div>
+            @can('roles-manage')
+                <div class="flex gap-3 w-full md:w-auto">
+                    <a href="{{ route('admin.roles.create') }}"
+                        class="flex-1 md:flex-none text-center px-6 py-2.5 bg-slate-900 text-white text-xs font-black uppercase tracking-widest rounded-xl hover:bg-slate-800 transition-all active:scale-95 shadow-md">
+                        Define New Role
+                    </a>
+                </div>
             @endcan
-        </div>
-        <div class="flex justify-between items-center mb-8">
-            <h1 class="text-3xl font-black text-slate-900">System Roles</h1>
         </div>
 
         <div class="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm">
@@ -62,21 +59,41 @@
                 </thead>
                 <tbody class="divide-y divide-slate-100">
                     @foreach($roles as $role)
-                    <tr class="hover:bg-slate-50/50 transition">
-                        <td class="px-6 py-4 font-bold text-slate-700 uppercase text-xs">{{ $role->name }}</td>
-                        <td class="px-6 py-4">
-                            <div class="flex flex-wrap gap-1">
-                                @foreach($role->permissions as $perm)
-                                <span
-                                    class="px-2 py-0.5 bg-slate-100 text-[9px] font-bold text-slate-500 rounded uppercase tracking-tighter">{{ $perm->name }}</span>
-                                @endforeach
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 text-right">
-                            <a href="{{ route('admin.roles.edit', $role->id) }}"
-                                class="text-xs font-black text-blue-600 uppercase">Edit</a>
-                        </td>
-                    </tr>
+                        <tr class="hover:bg-slate-50/50 transition">
+                            <td class="px-6 py-4 font-bold text-slate-700 uppercase text-xs">{{ $role->name }}</td>
+                            <td class="px-6 py-4">
+                                <div class="flex flex-wrap gap-1">
+                                    @foreach($role->permissions as $perm)
+                                        <span
+                                            class="px-2 py-0.5 bg-slate-100 text-[9px] font-bold text-slate-500 rounded uppercase tracking-tighter">{{ $perm->name }}</span>
+                                    @endforeach
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 text-right">
+                                <div class="flex justify-end gap-2">
+                                    @can('roles-manage')
+                                        <a href="{{ route('admin.roles.edit', $role->id) }}"
+                                            class="px-3 py-1.5 bg-white border border-slate-200 text-[11px] font-bold text-slate-600 rounded-lg hover:bg-slate-50 transition-all shadow-sm uppercase tracking-tighter">
+                                            Edit
+                                        </a>
+                                    @endcan
+
+                                    @can('roles-manage')
+                                        @if($role->id !== 1 && $role->name !== 'Admin')
+                                            <form action="{{ route('admin.roles.destroy', $role->id)}}" method="POST"
+                                                onsubmit="return confirm('Delete this role?');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button
+                                                    class="px-3 py-1.5 text-[11px] font-bold text-rose-500 hover:bg-rose-50 rounded-lg transition-all uppercase tracking-tighter">
+                                                    Delete
+                                                </button>
+                                            </form>
+                                        @endif
+                                    @endcan
+                                </div>
+                            </td>
+                        </tr>
                     @endforeach
                 </tbody>
             </table>

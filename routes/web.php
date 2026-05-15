@@ -27,7 +27,7 @@ Route::middleware('auth')->group(function () {
 });
 
 // 4. Admin Routes - FIXED NAMESPACE
-Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'permission:users-manage|roles-manage|permissions-manage'])->prefix('admin')->name('admin.')->group(function () {
 
     Route::resource('users', UserController::class);
     Route::resource('roles', RoleController::class);

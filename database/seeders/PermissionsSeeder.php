@@ -24,7 +24,6 @@ class PermissionsSeeder extends Seeder
             'users-manage',
             'roles-manage',
             'permissions-manage',
-            'profile-upload'
         ];
 
         foreach ($permissions as $permission) {
@@ -35,24 +34,48 @@ class PermissionsSeeder extends Seeder
         $adminRole = Role::create(['name' => 'admin']);
         $adminRole->givePermissionTo(Permission::all());
 
-        // 4. Create a Standard User Role
-        $userRole = Role::create(['name' => 'user']);
-        $userRole->givePermissionTo('profile-upload');
+        // 4. Create a Standard admin Role for manage only users-manage permission
+        $admin2 = Role::create(['name' => 'user-manager']);
+        $admin2->givePermissionTo('users-manage');
 
-        // 5. Create the Super Admin User
+        // 5. Create a Standard admin Role for manage only roles-manage permission
+        $admin3 = Role::create(['name' => 'role-manager']);
+        $admin3->givePermissionTo('roles-manage');
+
+        // 6. Create a Standard admin Role for manage only permissions-manage permission
+        $admin4 = Role::create(['name' => 'permission-manager']);
+        $admin4->givePermissionTo('permissions-manage');
+
+        // 7. Create the Super Admin User
         $admin = User::create([
-            'name' => 'System Admin',
+            'name' => 'admin',
             'email' => 'admin@test.com',
             'password' => Hash::make('password'), // Always hash passwords!
         ]);
         $admin->assignRole($adminRole);
 
-        // 6. Create a Regular Test User
-        $user = User::create([
-            'name' => 'Regular User',
-            'email' => 'user@test.com',
+        // 8. Create a Regular Test User
+        $userManager = User::create([
+            'name' => 'user-manager',
+            'email' => 'user-manager@test.com',
             'password' => Hash::make('password'),
         ]);
-        $user->assignRole($userRole);
+        $userManager->assignRole($admin2);
+
+        // 9. Create a Regular Test User
+        $roleManager = User::create([
+            'name' => 'role-manager',
+            'email' => 'role-manager@test.com',
+            'password' => Hash::make('password'),
+        ]);
+        $roleManager->assignRole($admin3);
+        
+        // 10. Create a Regular Test User
+        $permissionManager = User::create([
+            'name' => 'permission-manager',
+            'email' => 'permission-manager@test.com',
+            'password' => Hash::make('password'),
+        ]);
+        $permissionManager->assignRole($admin4);
     }
 }

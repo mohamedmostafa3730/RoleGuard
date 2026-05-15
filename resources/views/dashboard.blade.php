@@ -34,7 +34,7 @@
                     </a>
                 </div>
 
-                @role('admin')
+                @role('admin|user-manager|role-manager|permission-manager')
                 <div>
                     <p class="px-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">System Control
                     </p>
