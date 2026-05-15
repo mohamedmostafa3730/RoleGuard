@@ -16,7 +16,6 @@
 
 <body class="bg-slate-50 p-12">
     <div class="max-w-4xl mx-auto">
-        <!-- Header Section -->
         <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
             <div>
                 <h1 class="text-3xl font-extrabold tracking-tight text-slate-900">Manage Roles</h1>
@@ -30,7 +29,6 @@
             </div>
         </div>
 
-        <!-- Quick Actions Bar for Roles -->
         <div
             class="mb-6 flex flex-col md:flex-row gap-4 items-center justify-between bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
             <div class="flex items-center gap-2">
@@ -38,14 +36,15 @@
                 <span class="text-xs font-bold text-slate-500 uppercase tracking-tight">Access Control List (ACL)</span>
             </div>
 
-            @can('roles-manage')
+            {{-- Matching 'roles-creator' --}}
+            @canany(['roles-creator', 'roles-manage'])
                 <div class="flex gap-3 w-full md:w-auto">
                     <a href="{{ route('admin.roles.create') }}"
                         class="flex-1 md:flex-none text-center px-6 py-2.5 bg-slate-900 text-white text-xs font-black uppercase tracking-widest rounded-xl hover:bg-slate-800 transition-all active:scale-95 shadow-md">
-                        Define New Role
+                        + Role
                     </a>
                 </div>
-            @endcan
+            @endcanany
         </div>
 
         <div class="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm">
@@ -65,21 +64,25 @@
                                 <div class="flex flex-wrap gap-1">
                                     @foreach($role->permissions as $perm)
                                         <span
-                                            class="px-2 py-0.5 bg-slate-100 text-[9px] font-bold text-slate-500 rounded uppercase tracking-tighter">{{ $perm->name }}</span>
+                                            class="px-2 py-0.5 bg-slate-100 text-[9px] font-bold text-slate-500 rounded uppercase tracking-tighter">
+                                            {{ $perm->name }}
+                                        </span>
                                     @endforeach
                                 </div>
                             </td>
                             <td class="px-6 py-4 text-right">
                                 <div class="flex justify-end gap-2">
-                                    @can('roles-manage')
+                                    {{-- Matching 'roles-editor' --}}
+                                    @canany(['roles-editor', 'roles-manage'])
                                         <a href="{{ route('admin.roles.edit', $role->id) }}"
                                             class="px-3 py-1.5 bg-white border border-slate-200 text-[11px] font-bold text-slate-600 rounded-lg hover:bg-slate-50 transition-all shadow-sm uppercase tracking-tighter">
                                             Edit
                                         </a>
-                                    @endcan
+                                    @endcanany
 
-                                    @can('roles-manage')
-                                        @if($role->id !== 1 && $role->name !== 'Admin')
+                                    {{-- Matching 'roles-deleter' --}}
+                                    @canany(['roles-deleter', 'roles-manage'])
+                                        @if($role->id !== 1 && $role->name !== 'admin')
                                             <form action="{{ route('admin.roles.destroy', $role->id)}}" method="POST"
                                                 onsubmit="return confirm('Delete this role?');">
                                                 @csrf
@@ -90,7 +93,7 @@
                                                 </button>
                                             </form>
                                         @endif
-                                    @endcan
+                                    @endcanany
                                 </div>
                             </td>
                         </tr>
@@ -100,3 +103,5 @@
         </div>
     </div>
 </body>
+
+</html>

@@ -8,9 +8,9 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-    body {
-        font-family: 'Inter', sans-serif;
-    }
+        body {
+            font-family: 'Inter', sans-serif;
+        }
     </style>
 </head>
 
@@ -34,11 +34,12 @@
                     </a>
                 </div>
 
-                @role('admin|user-manager|role-manager|permission-manager')
+                @role('admin|user-manager|roles-manager|permissions-manager|deleter|creator|editor|viewer')
                 <div>
                     <p class="px-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">System Control
                     </p>
                     <div class="space-y-1">
+
                         <a href="{{ route('admin.users.index') }}"
                             class="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl hover:bg-slate-800 hover:text-white transition-all">
                             <span>👥</span> Users Management
@@ -94,7 +95,8 @@
                     <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
                         <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Files Hosted</p>
                         <div class="text-3xl font-black text-slate-800">
-                            {{ \Spatie\MediaLibrary\MediaCollections\Models\Media::count() }}</div>
+                            {{ \Spatie\MediaLibrary\MediaCollections\Models\Media::count() }}
+                        </div>
                     </div>
                 </div>
 
@@ -102,7 +104,7 @@
                     <h3 class="text-slate-800 text-lg font-bold mb-6">User Identity Info</h3>
                     <div class="flex items-center gap-8">
                         <div class="w-24 h-24 rounded-3xl bg-blue-50 border-4 border-white shadow-xl overflow-hidden">
-                            <img src="{{ $user->getFirstMediaUrl('avatars') ?: 'https://ui-avatars.com/api/?name='.$user->name }}"
+                            <img src="{{ $user->getFirstMediaUrl('avatars') ?: 'https://ui-avatars.com/api/?name=' . $user->name }}"
                                 class="w-full h-full object-cover">
                         </div>
                         <div class="space-y-2">

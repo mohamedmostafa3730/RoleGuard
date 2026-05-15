@@ -96,7 +96,7 @@
                 <div>
                     <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1 mb-3 block">Assign
                         Roles</label>
-                    <div class="grid grid-cols-1 gap-3">
+                    <div class="grid grid-cols-3 gap-3">
                         @foreach($roles as $role)
                         <label
                             class="group relative flex items-center p-4 rounded-2xl border border-slate-200 cursor-pointer hover:bg-blue-50/50 transition-all has-[:checked]:bg-blue-50 has-[:checked]:border-blue-300">

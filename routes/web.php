@@ -1,7 +1,5 @@
 <?php
 
-// 1. Correct Imports
-
 use App\Http\Controllers\Admin\PermissionController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\UserController;
@@ -9,6 +7,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 
+// 1. Welcome Route
 Route::get('/', function () {
     return view('welcome');
 });
@@ -26,12 +25,15 @@ Route::middleware('auth')->group(function () {
     Route::post('/profile/upload', [DashboardController::class, 'upload'])->name('profile.upload');
 });
 
-// 4. Admin Routes - FIXED NAMESPACE
-Route::middleware(['auth', 'permission:users-manage|roles-manage|permissions-manage'])->prefix('admin')->name('admin.')->group(function () {
+// 4. Admin Panel Routes
+Route::middleware([
+    'auth',
+    'role:admin|user-manager|role-manager|permissions-manager|creator|editor|deleter|viewer'
+])->prefix('admin')->name('admin.')->group(function () {
+    Route::resource('users', UserController::class)->except(['show']);
+    Route::resource('roles', RoleController::class)->except(['show']);
+    Route::resource('permissions', PermissionController::class)->except(['show']);
 
-    Route::resource('users', UserController::class);
-    Route::resource('roles', RoleController::class);
-    Route::resource('permissions', PermissionController::class); // Standardized
-
-    Route::post('/roles/{role}/permissions', [RoleController::class, 'syncPermissions'])->name('roles.sync');
+    Route::post('/roles/{role}/permissions', [RoleController::class, 'syncPermissions'])
+        ->name('roles.sync');
 });

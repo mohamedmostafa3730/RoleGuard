@@ -17,7 +17,6 @@
 <body class="bg-slate-50 text-slate-900 min-h-screen p-4 md:p-12">
 
     <div class="max-w-6xl mx-auto">
-        <!-- Header Section -->
         <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
             <div>
                 <h1 class="text-3xl font-extrabold tracking-tight text-slate-900">Manage Users</h1>
@@ -31,7 +30,6 @@
             </div>
         </div>
 
-        <!-- Success/Error Alerts -->
         @if(session('success'))
             <div
                 class="mb-6 p-4 bg-emerald-50 border border-emerald-100 text-emerald-700 rounded-xl flex items-center gap-3">
@@ -45,7 +43,6 @@
             </div>
         @endif
 
-        <!-- Quick Actions Bar -->
         <div
             class="mb-6 flex flex-col md:flex-row gap-4 items-center justify-between bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
             <div class="flex items-center gap-2">
@@ -54,17 +51,17 @@
                     Management</span>
             </div>
 
-            @can('users-manage')
+            {{-- Matching 'users-creator' --}}
+            @canany(['users-creator', 'users-manage'])
                 <div class="flex gap-3 w-full md:w-auto">
                     <a href="{{ route('admin.users.create') }}"
                         class="flex-1 md:flex-none text-center px-6 py-2.5 bg-slate-900 text-white text-xs font-black uppercase tracking-widest rounded-xl hover:bg-slate-800 transition-all active:scale-95 shadow-md">
-                        Add New Identity
+                        + Identity
                     </a>
                 </div>
-            @endcan
+            @endcanany
         </div>
 
-        <!-- Users Table Card -->
         <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
@@ -116,8 +113,7 @@
                                     <div class="flex flex-wrap gap-1">
                                         @forelse($user->roles as $role)
                                             <span
-                                                class="px-2 py-0.5 rounded-md text-[10px] font-bold border uppercase
-                                                        {{ $role->name === 'admin' ? 'bg-purple-50 text-purple-700 border-purple-100' : 'bg-blue-50 text-blue-700 border-blue-100' }}">
+                                                class="px-2 py-0.5 rounded-md text-[10px] font-bold border uppercase                                                                                    {{ $role->name === 'admin' ? 'bg-purple-50 text-purple-700 border-purple-100' : 'bg-blue-50 text-blue-700 border-blue-100' }}">
                                                 {{ $role->name }}
                                             </span>
                                         @empty
@@ -128,14 +124,16 @@
 
                                 <td class="px-6 py-4 text-right">
                                     <div class="flex justify-end gap-2">
-                                        @can('users-manage')
+                                        {{-- Matching 'users-editor' --}}
+                                        @canany(['users-editor', 'users-manage'])
                                             <a href="{{ route('admin.users.edit', $user->id) }}"
                                                 class="px-3 py-1.5 bg-white border border-slate-200 text-[11px] font-bold text-slate-600 rounded-lg hover:bg-slate-50 transition-all shadow-sm uppercase tracking-tighter">
                                                 Edit Access
                                             </a>
-                                        @endcan
+                                        @endcanany
 
-                                        @can('users-manage')
+                                        {{-- Matching 'users-deleter' --}}
+                                        @canany(['users-deleter', 'users-manage'])
                                             @if(auth()->id() !== $user->id && $user->hasRole('admin') !== true)
                                                 <form action="{{ route('admin.users.destroy', $user->id)}}" method="POST"
                                                     onsubmit="return confirm('Archive this user?');">
@@ -147,7 +145,7 @@
                                                     </button>
                                                 </form>
                                             @endif
-                                        @endcan
+                                        @endcanany
                                     </div>
                                 </td>
                             </tr>
@@ -163,7 +161,6 @@
             </div>
         </div>
     </div>
-
 </body>
 
 </html>

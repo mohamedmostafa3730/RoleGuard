@@ -2,11 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Http\Controllers\Admin\PermissionController;
-use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
@@ -18,5 +15,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call(PermissionsSeeder::class);
+        $this->call(RolesSeeder::class);
+        $this->call(UsersSeeder::class);
     }
 }
