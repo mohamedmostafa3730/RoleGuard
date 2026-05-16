@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\LoginRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -14,13 +15,10 @@ class AuthController extends Controller
     }
 
     // 2. Process the login attempt
-    public function login(Request $request)
+    public function login(LoginRequest $request)
     {
         // Validate the incoming data
-        $credentials = $request->validate([
-            'email' => ['required', 'email'],
-            'password' => ['required'],
-        ]);
+        $credentials = $request->validated();
 
         // Auth::attempt() automatically has the provided password and checks the database
         if (Auth::attempt($credentials)) {
