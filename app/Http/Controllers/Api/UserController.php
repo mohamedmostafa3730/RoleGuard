@@ -17,7 +17,9 @@ class UserController extends Controller
 
     public function index()
     {
-        $users = User::with(['roles', 'permissions'])->paginate(5);
+        $users = User::with(['roles', 'permissions'])
+            ->paginate(5)
+            ->onEachSide(1);
 
         return $this->successResponse([
             'users' => UserResource::collection($users),
