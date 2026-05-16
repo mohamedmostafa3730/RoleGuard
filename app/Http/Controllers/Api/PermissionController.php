@@ -73,7 +73,7 @@ class PermissionController extends Controller
 
         return $this->successResponse(
             new PermissionResource($permission),
-            'Permission created successfully',
+            'permission retrieved successfully',
             200
         );
     }
