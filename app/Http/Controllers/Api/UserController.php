@@ -7,13 +7,17 @@ use App\Http\Requests\user\CreateUserRequest;
 use App\Http\Requests\user\UpdateUserRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
+use App\Services\UserService\UserService;
 use App\Traits\ApiResponseTrait;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
     use ApiResponseTrait;
+
+    public function __construct(protected UserService $userService)
+    {
+    }
 
     public function index()
     {
@@ -39,24 +43,13 @@ class UserController extends Controller
 
         $this->authorize('create', User::class);
 
-        $data = $request->validated();
-
-        $data['password'] = Hash::make($data['password']);
-        $data['email_verified_at'] = now();
-
-        $user = User::create($data);
-
-        if ($request->has('roles')) {
-            $user->syncRoles($request->roles);
-        }
-
-        if ($request->hasFile('avatar')) {
-            $user->addMediaFromRequest('avatar')->toMediaCollection('avatars');
-        }
-
+        $user = $this->userService->create(
+            $request->validated(), // data
+            $request // request
+        );
 
         return $this->successResponse(
-            new UserResource($user->load('roles')),
+            new UserResource($user),
             'User created successfully',
             201
         );
@@ -64,12 +57,10 @@ class UserController extends Controller
 
     public function show(User $user)
     {
-        $this->authorize('view', User::class);
-
-        $user = User::with(['roles', 'permissions'])->findOrFail($user->id);
+        $this->authorize('view', $user);
 
         return $this->successResponse(
-            new UserResource($user),
+            new UserResource($user->load('roles')),
             'User retrieved successfully'
         );
     }
@@ -77,42 +68,28 @@ class UserController extends Controller
     public function update(UpdateUserRequest $request, User $user)
     {
 
-        $this->authorize('update', User::class);
+        $this->authorize('update', $user);
 
-        $validated = $request->validated();
-
-        if (!empty($validated['password'])) {
-            $validated['password'] = Hash::make($validated['password']);
-        } else {
-            unset($validated['password']);
-        }
-
-        $user->update($validated);
-
-        if ($request->has('roles')) {
-            $user->syncRoles($request->roles);
-        }
-
-        if ($request->hasFile('avatar')) {
-            $user->addMediaFromRequest('avatar')->toMediaCollection('avatars');
-        }
+        $updatedUser = $this->userService->update(
+            $user,
+            $request->validated(),
+            $request,
+        );
 
         return $this->successResponse(
-            new UserResource($user->load('roles')),
+            new UserResource($updatedUser->load('roles')),
             'User updated successfully'
         );
     }
 
     public function destroy(Request $request, User $user)
     {
+        $this->authorize('delete', $user);
 
-        $this->authorize('delete', User::class);
-
-        $user->clearMediaCollection('avatars');
-        $user->delete();
+        $deleted = $this->userService->delete($user);
 
         return $this->successResponse(
-            [],
+            new UserResource($deleted),
             'User deleted successfully'
         );
     }

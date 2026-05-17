@@ -6,9 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\role\CreateRoleRequest;
 use App\Http\Requests\role\UpdateRoleRequest;
 use App\Http\Resources\RoleResource;
-use App\Models\User;
+use App\Services\RoleService\RoleService;
 use App\Traits\ApiResponseTrait;
-use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 
 class RoleController extends Controller
@@ -17,6 +16,12 @@ class RoleController extends Controller
     /**
      * Display a listing of the resource.
      */
+
+    public function __construct(
+        private RoleService $roleService
+    ) {
+    }
+
     public function index()
     {
         $this->authorize('viewAny', Role::class);
@@ -43,7 +48,11 @@ class RoleController extends Controller
 
         $data = $request->validated();
 
-        $createdData = Role::create($data);
+
+        $createdData = $this->roleService->create(
+            $data,
+            $request
+        );
 
         return $this->successResponse(
             new RoleResource($createdData),
@@ -74,12 +83,14 @@ class RoleController extends Controller
     {
         $this->authorize('update', $role);
 
-        $role->update($request->validated());
+        $role = $this->roleService->update(
+            $role,
+            $request->validated(),
+            $request
+        );
 
         return $this->successResponse(
-            new RoleResource(
-                $role
-            ),
+            new RoleResource($role),
             'Role updated successfully.',
             200
         );
@@ -92,10 +103,10 @@ class RoleController extends Controller
     {
         $this->authorize('delete', $role);
 
-        $role->delete();
+        $deleted = $this->roleService->delete($role);
 
         return $this->successResponse(
-            [],
+            new RoleResource($deleted),
             'Permission deleted successfully'
         );
     }

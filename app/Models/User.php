@@ -21,6 +21,8 @@ class User extends Authenticatable implements HasMedia
     /** @use HasFactory<UserFactory> */
     use HasApiTokens, HasFactory, Notifiable, HasRoles, InteractsWithMedia;
 
+    protected $guard_name = 'web';
+
     /**
      * Get the attributes that should be cast.
      *
@@ -35,7 +37,6 @@ class User extends Authenticatable implements HasMedia
     }
     public function registerMediaCollections(): void
     {
-        $this->addMediaCollection('avatars')
-            ->singleFile();
+        $this->addMediaCollection('avatar')->singleFile();
     }
 }

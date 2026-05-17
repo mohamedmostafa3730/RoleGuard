@@ -2,56 +2,107 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 
 class RolesSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        // 1. Create Admin Role and assign all permissions
-        $adminRole = Role::create(['name' => 'admin']);
-        $adminRole->givePermissionTo(Permission::all());
+        // ensure permissions exist
+        $permissions = Permission::all();
 
-        // 2. Create a Standard admin Role for manage only users-manage permission
-        $admin2 = Role::create(['name' => 'user-manager']);
-        $admin2->givePermissionTo('users-manage');
+        /*
+        |----------------------------
+        | ADMIN (FULL ACCESS)
+        |----------------------------
+        */
+        $admin = Role::firstOrCreate([
+            'name' => 'admin',
+            'guard_name' => 'web',
+        ]);
 
-        // 3. Create a Standard admin Role for manage only roles-manage permission
-        $admin3 = Role::create(['name' => 'role-manager']);
-        $admin3->givePermissionTo('roles-manage');
+        $admin->syncPermissions($permissions);
 
-        // 4. Create a Standard admin Role for manage only permissions-manage permission
-        $admin4 = Role::create(['name' => 'permissions-manager']);
-        $admin4->givePermissionTo('permissions-manage');
+        /*
+        |----------------------------
+        | MANAGERS (module-based)
+        |----------------------------
+        */
 
-        // 5. Create a Standard admin Role for create only all data [users,roles,permissions]
-        $admin5 = Role::create(['name' => 'creator']);
-        $admin5->givePermissionTo('users-creator');
-        $admin5->givePermissionTo('roles-creator');
-        $admin5->givePermissionTo('permissions-creator');
+        $rolesManager = Role::firstOrCreate([
+            'name' => 'roles-manager',
+            'guard_name' => 'web',
+        ]);
+        $rolesManager->syncPermissions(
+            Permission::where('name', 'like', 'roles-%')->get()
+        );
 
-        // 6. Create a Standard admin Role for show only all data [users,roles,permissions]
-        $admin6 = Role::create(['name' => 'viewer']);
-        $admin6->givePermissionTo('users-viewer');
-        $admin6->givePermissionTo('roles-viewer');
-        $admin6->givePermissionTo('permissions-viewer');
+        $usersManager = Role::firstOrCreate([
+            'name' => 'users-manager',
+            'guard_name' => 'web',
+        ]);
+        $usersManager->syncPermissions(
+            Permission::where('name', 'like', 'users-%')->get()
+        );
 
-        // 7. Create a Standard admin Role for update only all data [users,roles,permissions]
-        $admin7 = Role::create(['name' => 'editor']);
-        $admin7->givePermissionTo('users-editor');
-        $admin7->givePermissionTo('roles-editor');
-        $admin7->givePermissionTo('permissions-editor');
+        $permissionsManager = Role::firstOrCreate([
+            'name' => 'permissions-manager',
+            'guard_name' => 'web',
+        ]);
+        $permissionsManager->syncPermissions(
+            Permission::where('name', 'like', 'permissions-%')->get()
+        );
 
-        // 8. Create a Standard admin Role for delete only all data  [users,roles,permissions]
-        $admin8 = Role::create(['name' => 'deleter']);
-        $admin8->givePermissionTo('users-deleter');
-        $admin8->givePermissionTo('roles-deleter');
-        $admin8->givePermissionTo('permissions-deleter');
+        /*
+        |----------------------------
+        | CRUD ROLES
+        |----------------------------
+        */
+
+        Role::firstOrCreate([
+            'name' => 'creator',
+            'guard_name' => 'web',
+        ])->syncPermissions(
+            Permission::whereIn('name', [
+                'users-create',
+                'roles-create',
+                'permissions-create',
+            ])->get()
+        );
+
+        Role::firstOrCreate([
+            'name' => 'viewer',
+            'guard_name' => 'web',
+        ])->syncPermissions(
+            Permission::whereIn('name', [
+                'users-view',
+                'roles-view',
+                'permissions-view',
+            ])->get()
+        );
+
+        Role::firstOrCreate([
+            'name' => 'editor',
+            'guard_name' => 'web',
+        ])->syncPermissions(
+            Permission::whereIn('name', [
+                'users-edit',
+                'roles-edit',
+                'permissions-edit',
+            ])->get()
+        );
+
+        Role::firstOrCreate([
+            'name' => 'deleter',
+            'guard_name' => 'web',
+        ])->syncPermissions(
+            Permission::whereIn('name', [
+                'users-delete',
+                'roles-delete',
+                'permissions-delete',
+            ])->get()
+        );
     }
 }

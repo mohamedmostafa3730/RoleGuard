@@ -7,36 +7,18 @@ use Spatie\Permission\Models\Permission;
 
 class PermissionsSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        $permissions = [
-            // only manage
-            'users-manage',
-            'roles-manage',
-            'permissions-manage',
-            // only view
-            'users-viewer',
-            'roles-viewer',
-            'permissions-viewer',
-            // only create
-            'users-creator',
-            'roles-creator',
-            'permissions-creator',
-            // only delete
-            'users-deleter',
-            'roles-deleter',
-            'permissions-deleter',
-            // only update
-            'users-editor',
-            'roles-editor',
-            'permissions-editor',
-        ];
+        $resources = ['users', 'roles', 'permissions'];
+        $actions = ['manage', 'view', 'create', 'edit', 'delete'];
 
-        foreach ($permissions as $permission) {
-            Permission::createOrFirst(['name' => $permission]);
+        foreach ($resources as $resource) {
+            foreach ($actions as $action) {
+                Permission::firstOrCreate([
+                    'name' => "{$resource}-{$action}",
+                    'guard_name' => 'web',
+                ]);
+            }
         }
     }
 }
