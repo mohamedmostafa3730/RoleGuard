@@ -18,6 +18,8 @@ class PermissionController extends Controller
      */
     public function index()
     {
+        $this->authorize('viewAny', Permission::class);
+
         $permissions = Permission::with('roles')->paginate(3)->onEachSide(1);
 
         return $this->successResponse([
@@ -36,18 +38,9 @@ class PermissionController extends Controller
      */
     public function store(CreatePermissionRequest $request)
     {
-        $currentUser = $request->user();
+        $this->authorize('create', Permission::class);
 
-        if (!$currentUser->hasAnyRole(['admin', 'permissions-manager', 'creator'])) {
-            return $this->errorResponse(
-                'Access Denied. You do not have permission to create users.',
-                403
-            );
-        }
-
-        $data = $request->validated();
-
-        $permission = Permission::create($data);
+        $permission = Permission::create($request->validated());
 
         return $this->successResponse(
             new PermissionResource($permission),
@@ -61,15 +54,7 @@ class PermissionController extends Controller
      */
     public function show(Permission $permission)
     {
-
-        if (!$permission) {
-            return $this->errorResponse('User not found', 404);
-        }
-
-        // => NOT WORK  
-        // if ($permission->guard_name === "web") {
-        //     return $this->errorResponse('There is no ', 404);
-        // }
+        $this->authorize('view', $permission);
 
         return $this->successResponse(
             new PermissionResource($permission),
@@ -83,14 +68,8 @@ class PermissionController extends Controller
      */
     public function update(UpdatePermissionRequest $request, Permission $permission)
     {
-        $currentUser = $request->user();
 
-        if (!$currentUser->hasAnyRole(['admin', 'permissions-manager', 'editor'])) {
-            return $this->errorResponse(
-                'Access Denied. You do not have permission to create users.',
-                403
-            );
-        }
+        $this->authorize('update', $permission);
 
         $permission->update($request->validated());
 
@@ -106,16 +85,9 @@ class PermissionController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Request $request, Permission $permission)
+    public function destroy(Permission $permission)
     {
-        $currentUser = $request->user();
-
-        if (!$currentUser->hasAnyRole(['admin', 'permissions-manager', 'deleter'])) {
-            return $this->errorResponse(
-                'Access Denied. You do not have permission to create users.',
-                403
-            );
-        }
+        $this->authorize('delete', $permission);
 
         $permission->delete();
 

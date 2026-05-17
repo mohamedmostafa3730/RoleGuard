@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\role\CreateRoleRequest;
 use App\Http\Requests\role\UpdateRoleRequest;
 use App\Http\Resources\RoleResource;
+use App\Models\User;
 use App\Traits\ApiResponseTrait;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
@@ -18,6 +19,8 @@ class RoleController extends Controller
      */
     public function index()
     {
+        $this->authorize('viewAny', Role::class);
+
         $roles = Role::paginate(5)->onEachSide(1);
 
         return $this->successResponse([
@@ -36,14 +39,7 @@ class RoleController extends Controller
      */
     public function store(CreateRoleRequest $request)
     {
-        $currentUser = $request->user();
-
-        if (!$currentUser->hasAnyRole(['admin', 'creator', 'role-manager'])) {
-            return $this->errorResponse(
-                'Access Denied. You do not have permission to create users.',
-                403
-            );
-        }
+        $this->authorize('create', Role::class);
 
         $data = $request->validated();
 
@@ -61,9 +57,8 @@ class RoleController extends Controller
      */
     public function show(Role $role)
     {
-        if (!$role) {
-            return $this->errorResponse('role is not found', 404);
-        }
+
+        $this->authorize('view', $role);
 
         return $this->successResponse(
             new RoleResource($role),
@@ -77,14 +72,7 @@ class RoleController extends Controller
      */
     public function update(UpdateRoleRequest $request, Role $role)
     {
-        $currentUser = $request->user();
-
-        if (!$currentUser->hasAnyRole(['admin', 'editor', 'role-manager'])) {
-            return $this->errorResponse(
-                'Access Denied. You do not have permission to create users.',
-                403
-            );
-        }
+        $this->authorize('update', $role);
 
         $role->update($request->validated());
 
@@ -100,16 +88,9 @@ class RoleController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Request $request, Role $role)
+    public function destroy(Role $role)
     {
-        $currentUser = $request->user();
-
-        if (!$currentUser->hasAnyRole(['admin', 'deleter', 'role-manager'])) {
-            return $this->errorResponse(
-                'Access Denied. You do not have permission to create users.',
-                403
-            );
-        }
+        $this->authorize('delete', $role);
 
         $role->delete();
 

@@ -17,6 +17,8 @@ class UserController extends Controller
 
     public function index()
     {
+        $this->authorize('viewAny', User::class);
+
         $users = User::with(['roles', 'permissions'])
             ->paginate(5)
             ->onEachSide(1);
@@ -34,14 +36,8 @@ class UserController extends Controller
 
     public function store(CreateUserRequest $request)
     {
-        $currentUser = $request->user();
 
-        if (!$currentUser->hasAnyRole(['admin', 'creator', 'user-manager'])) {
-            return $this->errorResponse(
-                'Access Denied. You do not have permission to create users.',
-                403
-            );
-        }
+        $this->authorize('create', User::class);
 
         $data = $request->validated();
 
@@ -66,13 +62,11 @@ class UserController extends Controller
         );
     }
 
-    public function show(string $id)
+    public function show(User $user)
     {
-        $user = User::with(['roles', 'permissions'])->find($id);
+        $this->authorize('view', User::class);
 
-        if (!$user) {
-            return $this->errorResponse('User not found', 404);
-        }
+        $user = User::with(['roles', 'permissions'])->findOrFail($user->id);
 
         return $this->successResponse(
             new UserResource($user),
@@ -83,14 +77,7 @@ class UserController extends Controller
     public function update(UpdateUserRequest $request, User $user)
     {
 
-        $currentUser = $request->user();
-
-        if (!$currentUser->hasAnyRole(['admin', 'editor', 'user-manager'])) {
-            return $this->errorResponse(
-                'Access Denied. You do not have permission to update users.' . $currentUser->roles->pluck('name'),
-                403
-            );
-        }
+        $this->authorize('update', User::class);
 
         $validated = $request->validated();
 
@@ -119,14 +106,7 @@ class UserController extends Controller
     public function destroy(Request $request, User $user)
     {
 
-        $currentUser = $request->user();
-
-        if (!$currentUser->hasAnyRole(['admin', 'deleter', 'user-manager'])) {
-            return $this->errorResponse(
-                'Access Denied. You do not have permission to delete users.',
-                403
-            );
-        }
+        $this->authorize('delete', User::class);
 
         $user->clearMediaCollection('avatars');
         $user->delete();
