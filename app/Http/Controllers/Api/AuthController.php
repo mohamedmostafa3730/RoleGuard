@@ -34,9 +34,11 @@ class AuthController extends Controller
 
     public function me()
     {
-        return $this->successResponse([
-            new UserResource(Auth::user())
-        ], 'User fetched successfully', 200);
+        return $this->successResponse(
+            new UserResource(Auth::user()),
+            'User fetched successfully',
+            200
+        );
     }
 
     public function logout(Request $request)

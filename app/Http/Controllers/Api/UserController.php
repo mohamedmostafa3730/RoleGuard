@@ -86,11 +86,12 @@ class UserController extends Controller
     {
         $this->authorize('delete', $user);
 
-        $deleted = $this->userService->delete($user);
-
+        $this->userService->delete($user);
+        
         return $this->successResponse(
-            new UserResource($deleted),
-            'User deleted successfully'
+            [],
+            'User deleted successfully',
+            200
         );
     }
 }

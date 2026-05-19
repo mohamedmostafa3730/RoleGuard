@@ -28,6 +28,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'role_or_permission' => RoleOrPermissionMiddleware::class,
         ]);
 
+        // $middleware->statefulApi();
+
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

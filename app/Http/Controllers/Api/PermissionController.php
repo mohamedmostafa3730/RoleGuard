@@ -101,11 +101,10 @@ class PermissionController extends Controller
     {
         $this->authorize('delete', $permission);
 
-        $deleted = $this->permissionService->delete($permission);
-
         return $this->successResponse(
-            new PermissionResource($deleted),
+            [],
             'Permission deleted successfully',
+            204
         );
     }
 }

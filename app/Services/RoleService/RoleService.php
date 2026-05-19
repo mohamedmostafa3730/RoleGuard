@@ -27,6 +27,16 @@ class RoleService
     public function delete(Role $role): bool
     {
         return DB::transaction(function () use ($role) {
+            // user role cann't delete role with name admin
+            if ($role->name == 'admin') {
+                throw new \Exception('You can not delete admin role');
+            }
+            // role cann't delete if user has this role
+            if ($role->users()->count() > 0) {
+                throw new \Exception('You can not delete role with users');
+            }
+
+            // delete role
             return $role->delete();
         });
     }

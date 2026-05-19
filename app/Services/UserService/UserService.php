@@ -67,7 +67,23 @@ class UserService
     public function delete(User $user)
     {
         return DB::transaction(function () use ($user) {
-            $user->clearMediaCollection('avatar');
+            
+            // User cann't delete yourself
+            if ($user->id == auth()->id()) {
+                throw new \Exception('You can not delete yourself');
+            }
+
+            // user cann't delete any other user has admin user
+            if ($user->hasRole('admin')) {
+                throw new \Exception('You can not delete admin user');
+            }
+
+            // if user has avatar delete it
+            if($user->hasMedia('avatar')) {
+                $user->clearMediaCollection('avatar');
+            }
+            
+            // delete user
             $user->delete();
             return true;
         });

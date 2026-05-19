@@ -23,7 +23,7 @@ class CreateRoleRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "name" => "required|string|max:255|min:3",
+            "name" => "required|unique:roles|string|max:255|min:3",
         ];
     }
 
@@ -31,6 +31,7 @@ class CreateRoleRequest extends FormRequest
     {
         return [
             "name.required" => "The name field is required.",
+            "name.unique" => "The name field must be unique.",
             "name.string" => "The name field must be a string.",
             "name.max" => "The name field must be at most 255 characters long.",
             "name.min" => "The name field must be at least 3 characters long.",

@@ -103,11 +103,12 @@ class RoleController extends Controller
     {
         $this->authorize('delete', $role);
 
-        $deleted = $this->roleService->delete($role);
+        $this->roleService->delete($role);
 
         return $this->successResponse(
-            new RoleResource($deleted),
-            'Permission deleted successfully'
+            [],
+            'Role deleted successfully',
+            200
         );
     }
 }

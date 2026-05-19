@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Route;
 Route::post('auth/login', [AuthController::class, 'login']);
 
 
+
 /*
 |--------------------------------------------------------------------------
 | Protected Routes (Sanctum Middleware Guards This Group)
@@ -23,15 +24,15 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Auth actions that require being logged in
     Route::prefix('auth')->group(function () {
-        Route::post('logout', [AuthController::class, 'logout']);
         Route::get('me', [AuthController::class, 'me']);
         Route::post('refresh', [AuthController::class, 'refresh']);
+        Route::post('logout', [AuthController::class, 'logout']);
     });
 
     // User CRUD endpoints
     Route::apiResource('users', UserController::class);
     // Role CRUD endPoints
-    Route::apiResource('roles',RoleController::class);
+    Route::apiResource('roles', RoleController::class);
     // Permissions CRUD endPoint
-    Route::apiResource('permissions',PermissionController::class);
+    Route::apiResource('permissions', PermissionController::class);
 });

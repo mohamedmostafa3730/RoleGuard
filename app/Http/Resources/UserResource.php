@@ -15,11 +15,11 @@ class UserResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->id,
+            "id" => $this->id,
             'name' => $this->name,
             'email' => $this->email,
             'email_verified_at' => $this->email_verified_at?->toDateTimeString(),
-            'avatar' => $this->getFirstMediaUrl('avatars'),
+            'avatar' => $this->getFirstMediaUrl('avatar') ?: null,
             'roles' => RoleResource::collection($this->whenLoaded('roles')),
             'permissions' => PermissionResource::collection($this->whenLoaded('permissions')),
             'created_at' => $this->created_at?->toDateTimeString(),

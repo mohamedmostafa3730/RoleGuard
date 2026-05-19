@@ -22,10 +22,13 @@ class PermissionService
         });
     }
 
-    public function delete(Permission $permission): Permission
+    public function delete(Permission $permission): bool
     {
         return DB::transaction(function () use ($permission) {
-            return $permission->delete();
+
+            Permission::destroy($permission->id);
+
+            return true;
         });
     }
 }
