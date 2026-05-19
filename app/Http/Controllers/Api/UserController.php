@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Exceptions\ApiException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\user\CreateUserRequest;
 use App\Http\Requests\user\UpdateUserRequest;
@@ -84,10 +85,12 @@ class UserController extends Controller
 
     public function destroy(Request $request, User $user)
     {
+        //Authorize
         $this->authorize('delete', $user);
 
+        // Delete User
         $this->userService->delete($user);
-        
+
         return $this->successResponse(
             [],
             'User deleted successfully',

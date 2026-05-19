@@ -2,6 +2,7 @@
 
 namespace App\Services\UserService;
 
+use App\Exceptions\ApiException;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -67,22 +68,22 @@ class UserService
     public function delete(User $user)
     {
         return DB::transaction(function () use ($user) {
-            
+
             // User cann't delete yourself
             if ($user->id == auth()->id()) {
-                throw new \Exception('You can not delete yourself');
+                throw new ApiException('You can not delete yourself', 404);
             }
 
             // user cann't delete any other user has admin user
             if ($user->hasRole('admin')) {
-                throw new \Exception('You can not delete admin user');
+                throw new ApiException('You can not delete admin user', 404);
             }
 
             // if user has avatar delete it
-            if($user->hasMedia('avatar')) {
+            if ($user->hasMedia('avatar')) {
                 $user->clearMediaCollection('avatar');
             }
-            
+
             // delete user
             $user->delete();
             return true;
